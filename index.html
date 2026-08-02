@@ -6,125 +6,100 @@
 <title>Java Pattern Visualizer</title>
 <style>
   :root{
-    --bg-deep:#11121a;
-    --panel:#171925;
-    --panel-alt:#1e2130;
-    --border:#2a2d40;
-    --text:#e4e6f1;
-    --dim:#7d81a0;
-    --amber:#f4b860;
-    --mint:#6ee7b7;
-    --rose:#f472b6;
-    --blue:#7aa2f7;
+    --bg-deep:#11121a; --panel:#171925; --panel-alt:#1e2130; --border:#2a2d40;
+    --text:#e4e6f1; --dim:#7d81a0; --amber:#f4b860; --mint:#6ee7b7; --rose:#f472b6;
+    --blue:#7aa2f7; --red:#f87171;
     --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
     --sans: -apple-system, "Segoe UI", "Noto Sans Devanagari", system-ui, sans-serif;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--bg-deep); color:var(--text);
-    font-family:var(--sans); padding:18px;
-  }
-  .wrap{max-width:1100px; margin:0 auto;}
-  header{
-    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
-    margin-bottom:14px;
-  }
-  h1{
-    font-size:19px; margin:0; font-weight:700; letter-spacing:.2px;
-  }
+  body{margin:0; background:var(--bg-deep); color:var(--text); font-family:var(--sans); padding:16px;}
+  .wrap{max-width:1120px; margin:0 auto;}
+  header{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
+  h1{font-size:19px; margin:0; font-weight:700;}
   h1 .pc{color:var(--amber);}
-  .sub{color:var(--dim); font-size:13px; margin:0;}
+  .sub{color:var(--dim); font-size:12.5px; margin:0;}
 
   .controls{
-    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
-    background:var(--panel); border:1px solid var(--border);
-    border-radius:12px; padding:12px 14px; margin-bottom:14px;
+    display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end;
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:12px 14px; margin-bottom:12px;
   }
   .ctrl-group{display:flex; flex-direction:column; gap:4px;}
   .ctrl-group label{font-size:11px; color:var(--dim);}
   select, input[type=range]{
     background:var(--panel-alt); color:var(--text); border:1px solid var(--border);
-    border-radius:8px; padding:6px 8px; font-family:var(--sans); font-size:13px;
+    border-radius:8px; padding:6px 8px; font-family:var(--sans); font-size:12.5px;
   }
-  select{cursor:pointer;}
-  .btns{display:flex; gap:6px; margin-left:auto;}
+  select{cursor:pointer; max-width:220px;}
+  .btns{display:flex; gap:6px; margin-left:auto; flex-wrap:wrap;}
   button{
     background:var(--panel-alt); color:var(--text); border:1px solid var(--border);
-    border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer;
+    border-radius:8px; padding:8px 12px; font-size:12.5px; cursor:pointer;
     font-family:var(--sans); transition:transform .1s, border-color .15s;
   }
   button:hover{border-color:var(--amber);}
   button:active{transform:scale(.96);}
+  button:disabled{opacity:.4; cursor:not-allowed;}
   button.play{background:var(--amber); color:#1a1508; border-color:var(--amber); font-weight:600;}
+  button.run{background:var(--mint); color:#062018; border-color:var(--mint); font-weight:600;}
   .checkbox-row{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--dim);}
 
-  .grid-main{
-    display:grid; grid-template-columns: 1.1fr 1fr; gap:14px;
-  }
+  .grid-main{display:grid; grid-template-columns: 1.15fr 1fr; gap:14px;}
   @media (max-width:760px){ .grid-main{grid-template-columns:1fr;} }
 
-  .panel{
-    background:var(--panel); border:1px solid var(--border); border-radius:12px;
-    padding:14px; min-width:0;
-  }
-  .panel h2{
-    font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--dim);
-    margin:0 0 10px 0; font-weight:600;
-  }
+  .panel{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px; min-width:0;}
+  .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .panel h2{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--dim); margin:0; font-weight:600;}
+  .panel-head .btns{margin-left:0; gap:6px;}
 
   code.line{
-    display:flex; gap:10px; font-family:var(--mono); font-size:13px;
-    padding:2px 8px; border-radius:5px; white-space:pre; color:var(--text);
-    line-height:1.65;
+    display:flex; gap:10px; font-family:var(--mono); font-size:12.5px;
+    padding:2px 8px; border-radius:5px; white-space:pre; color:var(--text); line-height:1.6;
   }
   code.line .ln{color:var(--dim); width:16px; text-align:right; flex-shrink:0; user-select:none;}
   code.line.active{background:rgba(244,184,96,.15); box-shadow:inset 3px 0 0 var(--amber);}
   code.line.active .ln{color:var(--amber);}
 
-  .watch{
-    display:flex; gap:10px; margin:12px 0 4px 0; flex-wrap:wrap;
+  #codeEdit{
+    width:100%; min-height:260px; background:#0b0c13; color:var(--text); border:1px solid var(--border);
+    border-radius:8px; padding:10px; font-family:var(--mono); font-size:12.5px; line-height:1.6;
+    resize:vertical;
   }
-  .chip{
-    font-family:var(--mono); font-size:12px; padding:5px 10px; border-radius:20px;
-    border:1px solid var(--border); background:var(--panel-alt); color:var(--dim);
-    transition:all .15s;
+  .errBanner{
+    display:none; background:rgba(248,113,113,.12); border:1px solid var(--red); color:#fecaca;
+    font-size:12px; padding:8px 10px; border-radius:8px; margin-top:8px; font-family:var(--mono);
+    white-space:pre-wrap;
   }
-  .chip b{color:inherit;}
-  .chip.i.on{border-color:var(--rose); color:var(--rose); box-shadow:0 0 0 2px rgba(244,114,182,.12);}
-  .chip.j.on{border-color:var(--blue); color:var(--blue); box-shadow:0 0 0 2px rgba(122,162,247,.12);}
+  .hint{font-size:11px; color:var(--dim); margin-top:8px; line-height:1.6;}
+  .hint code{color:var(--mint); font-family:var(--mono);}
 
-  .explain{
-    font-size:12.5px; color:var(--dim); margin-top:10px; min-height:34px;
-    border-top:1px dashed var(--border); padding-top:8px; line-height:1.5;
-  }
+  .watch{display:flex; gap:8px; margin:12px 0 4px 0; flex-wrap:wrap; min-height:26px;}
+  .chip{font-family:var(--mono); font-size:11.5px; padding:5px 10px; border-radius:20px; border:1px solid var(--border); background:var(--panel-alt); transition:all .1s;}
+
+  .explain{font-size:12.5px; color:var(--dim); margin-top:8px; min-height:34px; border-top:1px dashed var(--border); padding-top:8px; line-height:1.5;}
   .explain b{color:var(--text);}
 
-  .stage-grid{
-    display:grid; gap:3px; justify-content:center; margin:6px auto 10px auto;
-  }
+  .stage-grid{display:grid; gap:3px; justify-content:center; margin:6px auto 10px auto;}
   .cell{
-    width:24px; height:24px; display:flex; align-items:center; justify-content:center;
-    font-family:var(--mono); font-size:15px; border-radius:4px;
-    background:var(--panel-alt); color:transparent;
-    transition:background .15s, color .1s, transform .15s;
+    width:var(--cellsize,24px); height:var(--cellsize,24px); display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:calc(var(--cellsize,24px) * 0.55); border-radius:4px;
+    background:var(--panel-alt); color:transparent; transition:background .12s, color .1s, transform .12s;
   }
   .cell.star{color:var(--mint); background:rgba(110,231,183,.12); transform:scale(1.02);}
+  .cell.value{color:var(--amber); background:rgba(244,184,96,.12); font-weight:700;}
   .cell.space-dot{color:var(--dim); background:transparent;}
   .cell.pulse{outline:2px solid var(--amber);}
 
   .console{
-    margin-top:10px; background:#0b0c13; border:1px solid var(--border);
-    border-radius:8px; padding:10px 12px; font-family:var(--mono); font-size:13px;
-    color:var(--mint); min-height:60px; max-height:180px; overflow:auto;
-    white-space:pre-wrap; line-height:1.5;
+    margin-top:10px; background:#0b0c13; border:1px solid var(--border); border-radius:8px;
+    padding:10px 12px; font-family:var(--mono); font-size:12.5px; color:var(--mint);
+    min-height:60px; max-height:170px; overflow:auto; white-space:pre-wrap; line-height:1.5;
   }
-  .console .caret{display:inline-block; width:7px; height:14px; background:var(--mint);
-    vertical-align:middle; animation:blink 1s step-end infinite;}
+  .console .caret{display:inline-block; width:7px; height:14px; background:var(--mint); vertical-align:middle; animation:blink 1s step-end infinite;}
   @keyframes blink{50%{opacity:0;}}
 
-  .progress{
-    height:4px; background:var(--panel-alt); border-radius:3px; overflow:hidden; margin-top:10px;
-  }
+  .progress{height:4px; background:var(--panel-alt); border-radius:3px; overflow:hidden; margin-top:10px;}
   .progress > div{height:100%; background:var(--amber); width:0%; transition:width .1s linear;}
 </style>
 </head>
@@ -132,49 +107,49 @@
 <div class="wrap">
   <header>
     <h1><span class="pc">▍</span>Java Pattern Visualizer</h1>
-    <p class="sub">loop chalne ke saath code aur output दोनों साथ-साथ देखो</p>
+    <p class="sub">templates चुनो या खुद का Java-जैसा loop code लिखो — दोनों तरह से step-by-step visualize होगा</p>
   </header>
 
   <div class="controls">
     <div class="ctrl-group">
-      <label>पैटर्न</label>
-      <select id="patternSel">
-        <option value="triangle">Right Triangle</option>
-        <option value="invTriangle">Inverted Right Triangle</option>
-        <option value="pyramid">Pyramid</option>
-        <option value="invPyramid">Inverted Pyramid</option>
-        <option value="diamond">Diamond</option>
-      </select>
+      <label>Template</label>
+      <select id="templateSel"></select>
     </div>
     <div class="ctrl-group">
-      <label>पंक्तियाँ (n = <span id="nVal">5</span>)</label>
-      <input type="range" id="nRange" min="3" max="9" value="5" style="width:120px;">
+      <label>पंक्तियाँ (n = <span id="nVal">6</span>)</label>
+      <input type="range" id="nRange" min="3" max="10" value="6" style="width:110px;">
     </div>
     <div class="ctrl-group">
       <label>गति</label>
-      <input type="range" id="speedRange" min="1" max="10" value="6" style="width:100px;">
+      <input type="range" id="speedRange" min="1" max="10" value="6" style="width:90px;">
     </div>
     <div class="checkbox-row">
       <input type="checkbox" id="showSpaces" checked>
       <label for="showSpaces">spaces दिखाएं (·)</label>
     </div>
     <div class="btns">
-      <button id="backBtn" title="एक कदम पीछे">⏮ पीछे</button>
+      <button id="backBtn">⏮ पीछे</button>
       <button id="playBtn" class="play">▶ चलाएँ</button>
-      <button id="stepBtn" title="एक कदम आगे">अगला ⏭</button>
+      <button id="stepBtn">अगला ⏭</button>
       <button id="resetBtn">↺ रीसेट</button>
     </div>
   </div>
 
   <div class="grid-main">
     <div class="panel">
-      <h2>Java Code</h2>
-      <div id="codeBox"></div>
-      <div class="watch">
-        <span class="chip i" id="chipI">i = —</span>
-        <span class="chip j" id="chipJ">j = —</span>
+      <div class="panel-head">
+        <h2>Java Code</h2>
+        <div class="btns">
+          <button id="editBtn">✎ Edit</button>
+          <button id="cancelBtn" style="display:none;">✕ रद्द करें</button>
+        </div>
       </div>
-      <div class="explain" id="explainBox">▶ दबाओ या "अगला" पर क्लिक करके शुरू करो।</div>
+      <div id="codeBox"></div>
+      <textarea id="codeEdit" style="display:none;" spellcheck="false"></textarea>
+      <div class="errBanner" id="errBanner"></div>
+      <div class="hint">समर्थित syntax: <code>for(int i=..;..;i++/i--)</code>, <code>if(...){...} else {...}</code>, <code>System.out.print("*"/" "/j)</code>, <code>System.out.println()</code>, <code>int x = ..;</code>, <code>x = x+1;</code> | operators: <code>+ - * / % &lt; &lt;= &gt; &gt;= == != && || !</code></div>
+      <div class="watch" id="watchChips"></div>
+      <div class="explain" id="explainBox">Template चुनो या ▶ दबाओ।</div>
       <div class="progress"><div id="progBar"></div></div>
     </div>
 
@@ -188,285 +163,639 @@
 </div>
 
 <script>
-const codeBox = document.getElementById('codeBox');
-const stageGrid = document.getElementById('stageGrid');
-const consoleBox = document.getElementById('consoleBox');
-const explainBox = document.getElementById('explainBox');
-const chipI = document.getElementById('chipI');
-const chipJ = document.getElementById('chipJ');
-const progBar = document.getElementById('progBar');
-const patternSel = document.getElementById('patternSel');
-const nRange = document.getElementById('nRange');
-const nVal = document.getElementById('nVal');
-const speedRange = document.getElementById('speedRange');
-const showSpaces = document.getElementById('showSpaces');
-const playBtn = document.getElementById('playBtn');
-const stepBtn = document.getElementById('stepBtn');
-const backBtn = document.getElementById('backBtn');
-const resetBtn = document.getElementById('resetBtn');
-
-const CODES = {
-  triangle: [
-    'for (int i = 1; i <= n; i++) {',
-    '  for (int j = 1; j <= i; j++) {',
-    '    System.out.print("*");',
-    '  }',
-    '  System.out.println();',
-    '}'
-  ],
-  invTriangle: [
-    'for (int i = n; i >= 1; i--) {',
-    '  for (int j = 1; j <= i; j++) {',
-    '    System.out.print("*");',
-    '  }',
-    '  System.out.println();',
-    '}'
-  ],
-  pyramid: [
-    'for (int i = 1; i <= n; i++) {',
-    '  for (int j = 1; j <= n - i; j++) {',
-    '    System.out.print(" ");',
-    '  }',
-    '  for (int j = 1; j <= i; j++) {',
-    '    System.out.print("*");',
-    '  }',
-    '  System.out.println();',
-    '}'
-  ],
-  invPyramid: [
-    'for (int i = n; i >= 1; i--) {',
-    '  for (int j = 1; j <= n - i; j++) {',
-    '    System.out.print(" ");',
-    '  }',
-    '  for (int j = 1; j <= i; j++) {',
-    '    System.out.print("*");',
-    '  }',
-    '  System.out.println();',
-    '}'
-  ],
-  diamond: [
-    '// upper half',
-    'for (int i = 1; i <= n; i++) {',
-    '  for (int j = 1; j <= n - i; j++) {',
-    '    System.out.print(" ");',
-    '  }',
-    '  for (int j = 1; j <= i; j++) {',
-    '    System.out.print("*");',
-    '  }',
-    '  System.out.println();',
-    '}',
-    '// lower half',
-    'for (int i = n - 1; i >= 1; i--) {',
-    '  for (int j = 1; j <= n - i; j++) {',
-    '    System.out.print(" ");',
-    '  }',
-    '  for (int j = 1; j <= i; j++) {',
-    '    System.out.print("*");',
-    '  }',
-    '  System.out.println();',
-    '}'
-  ]
-};
-// codes are 0-indexed above, generators use 1-indexed line refs -> convert (line-1)
-
-function genTriangle(n){
-  const steps=[];
-  for(let i=1;i<=n;i++){
-    steps.push({type:'row-start', i, line:1, note:`बाहरी loop: i = ${i} पर पंक्ति शुरू`});
-    for(let j=1;j<=i;j++){
-      steps.push({type:'check', i,j,line:2, note:`अंदर वाला loop check: j = ${j} (<= i यानी ${i})`});
-      steps.push({type:'star', i,j,line:3,row:i-1,col:j-1, note:`print("*") → row ${i}, position ${j} पर तारा`});
-    }
-    steps.push({type:'newline', i, line:5, note:`println() → अगली लाइन पर जाओ`});
+/* ---------------- Templates ---------------- */
+const TEMPLATES = [
+{id:'right_triangle', group:'त्रिभुज', label:'Right Triangle', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
   }
-  return steps;
+  System.out.println();
+}`},
+{id:'right_triangle_mirror', group:'त्रिभुज', label:'Right Triangle (mirror)', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'inv_right_triangle', group:'त्रिभुज', label:'Inverted Right Triangle', code:
+`for (int i = n; i >= 1; i--) {
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'inv_right_triangle_mirror', group:'त्रिभुज', label:'Inverted Right Triangle (mirror)', code:
+`for (int i = n; i >= 1; i--) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'pyramid', group:'पिरामिड / हीरा', label:'Pyramid', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= 2 * i - 1; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'inv_pyramid', group:'पिरामिड / हीरा', label:'Inverted Pyramid', code:
+`for (int i = n; i >= 1; i--) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= 2 * i - 1; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'diamond', group:'पिरामिड / हीरा', label:'Diamond', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= 2 * i - 1; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
 }
-function genInvTriangle(n){
-  const steps=[];
-  for(let i=n;i>=1;i--){
-    const rowIdx = n-i;
-    steps.push({type:'row-start', i, line:1, note:`i = ${i} (घटते क्रम में)`});
-    for(let j=1;j<=i;j++){
-      steps.push({type:'check', i,j,line:2, note:`j = ${j} (<= i यानी ${i})`});
-      steps.push({type:'star', i,j,line:3,row:rowIdx,col:j-1, note:`print("*") → ${i} तारे वाली पंक्ति`});
-    }
-    steps.push({type:'newline', i, line:5, note:`println()`});
+for (int i = n - 1; i >= 1; i--) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
   }
-  return steps;
+  for (int j = 1; j <= 2 * i - 1; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'hollow_triangle', group:'खोखले पैटर्न', label:'Hollow Right Triangle', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= i; j++) {
+    if (j == 1 || j == i || i == n) {
+      System.out.print("*");
+    } else {
+      System.out.print(" ");
+    }
+  }
+  System.out.println();
+}`},
+{id:'hollow_pyramid', group:'खोखले पैटर्न', label:'Hollow Pyramid', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  int w = 2 * i - 1;
+  for (int j = 1; j <= w; j++) {
+    if (j == 1 || j == w || i == n) {
+      System.out.print("*");
+    } else {
+      System.out.print(" ");
+    }
+  }
+  System.out.println();
+}`},
+{id:'hollow_diamond', group:'खोखले पैटर्न', label:'Hollow Diamond', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  int w = 2 * i - 1;
+  for (int j = 1; j <= w; j++) {
+    if (j == 1 || j == w) {
+      System.out.print("*");
+    } else {
+      System.out.print(" ");
+    }
+  }
+  System.out.println();
 }
-function genPyramid(n){
-  const steps=[];
-  for(let i=1;i<=n;i++){
-    steps.push({type:'row-start', i, line:1, note:`i = ${i}`});
-    const sp=n-i;
-    for(let j=1;j<=sp;j++){
-      steps.push({type:'check', i,j,line:2, note:`space loop: j = ${j} (<= n-i यानी ${sp})`});
-      steps.push({type:'space', i,j,line:3,row:i-1,col:j-1, note:`print(" ") → खाली जगह जिससे pyramid center में आए`});
-    }
-    for(let j=1;j<=i;j++){
-      steps.push({type:'check', i,j,line:5, note:`star loop: j = ${j} (<= i यानी ${i})`});
-      steps.push({type:'star', i,j,line:6,row:i-1,col:sp+j-1, note:`print("*")`});
-    }
-    steps.push({type:'newline', i, line:8, note:`println()`});
+for (int i = n - 1; i >= 1; i--) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
   }
-  return steps;
+  int w = 2 * i - 1;
+  for (int j = 1; j <= w; j++) {
+    if (j == 1 || j == w) {
+      System.out.print("*");
+    } else {
+      System.out.print(" ");
+    }
+  }
+  System.out.println();
+}`},
+{id:'num_triangle', group:'संख्या पैटर्न', label:'Number Triangle (1..i)', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= i; j++) {
+    System.out.print(j);
+  }
+  System.out.println();
+}`},
+{id:'num_same_row', group:'संख्या पैटर्न', label:'Number Triangle (row repeat)', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= i; j++) {
+    System.out.print(i);
+  }
+  System.out.println();
+}`},
+{id:'num_desc', group:'संख्या पैटर्न', label:'Inverted Number Triangle', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = i; j >= 1; j--) {
+    System.out.print(j);
+  }
+  System.out.println();
+}`},
+{id:'floyd', group:'संख्या पैटर्न', label:"Floyd's Triangle", code:
+`int num = 1;
+for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= i; j++) {
+    System.out.print(num);
+    num = num + 1;
+  }
+  System.out.println();
+}`},
+{id:'num_pyramid', group:'संख्या पैटर्न', label:'Number Pyramid', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= i; j++) {
+    System.out.print(j);
+  }
+  System.out.println();
+}`},
+{id:'checkerboard', group:'मज़ेदार पैटर्न', label:'Checkerboard', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n; j++) {
+    if ((i + j) % 2 == 0) {
+      System.out.print("*");
+    } else {
+      System.out.print(" ");
+    }
+  }
+  System.out.println();
+}`},
+{id:'cross', group:'मज़ेदार पैटर्न', label:'Plus / Cross', code:
+`int mid = (n + 1) / 2;
+for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n; j++) {
+    if (i == mid || j == mid) {
+      System.out.print("*");
+    } else {
+      System.out.print(" ");
+    }
+  }
+  System.out.println();
+}`},
+{id:'xpattern', group:'मज़ेदार पैटर्न', label:'X Pattern', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= n; j++) {
+    if (j == i || j == n - i + 1) {
+      System.out.print("*");
+    } else {
+      System.out.print(" ");
+    }
+  }
+  System.out.println();
+}`},
+{id:'hourglass', group:'मज़ेदार पैटर्न', label:'Hourglass', code:
+`for (int i = n; i >= 1; i--) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= 2 * i - 1; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
 }
-function genInvPyramid(n){
-  const steps=[];
-  for(let i=n;i>=1;i--){
-    const rowIdx=n-i;
-    steps.push({type:'row-start', i, line:1, note:`i = ${i} (घटते क्रम में)`});
-    const sp=n-i;
-    for(let j=1;j<=sp;j++){
-      steps.push({type:'check', i,j,line:2, note:`space loop: j = ${j} (<= n-i यानी ${sp})`});
-      steps.push({type:'space', i,j,line:3,row:rowIdx,col:j-1, note:`print(" ")`});
-    }
-    for(let j=1;j<=i;j++){
-      steps.push({type:'check', i,j,line:5, note:`star loop: j = ${j} (<= i यानी ${i})`});
-      steps.push({type:'star', i,j,line:6,row:rowIdx,col:sp+j-1, note:`print("*")`});
-    }
-    steps.push({type:'newline', i, line:8, note:`println()`});
+for (int i = 2; i <= n; i++) {
+  for (int j = 1; j <= n - i; j++) {
+    System.out.print(" ");
   }
-  return steps;
+  for (int j = 1; j <= 2 * i - 1; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'butterfly', group:'मज़ेदार पैटर्न', label:'Butterfly', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
+  }
+  for (int j = 1; j <= 2 * (n - i); j++) {
+    System.out.print(" ");
+  }
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
 }
-function genDiamond(n){
-  const steps=[];
-  for(let i=1;i<=n;i++){
-    steps.push({type:'row-start', i, line:2, note:`ऊपरी हिस्सा: i = ${i}`});
-    const sp=n-i;
-    for(let j=1;j<=sp;j++){
-      steps.push({type:'check', i,j,line:3, note:`space loop: j = ${j}`});
-      steps.push({type:'space', i,j,line:4,row:i-1,col:j-1, note:`print(" ")`});
-    }
-    for(let j=1;j<=i;j++){
-      steps.push({type:'check', i,j,line:6, note:`star loop: j = ${j}`});
-      steps.push({type:'star', i,j,line:7,row:i-1,col:sp+j-1, note:`print("*")`});
-    }
-    steps.push({type:'newline', i, line:9, note:`println()`});
+for (int i = n; i >= 1; i--) {
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
   }
-  for(let i=n-1;i>=1;i--){
-    const rowIdx = n + (n-1-i);
-    steps.push({type:'row-start', i, line:11, note:`निचला हिस्सा: i = ${i}`});
-    const sp=n-i;
-    for(let j=1;j<=sp;j++){
-      steps.push({type:'check', i,j,line:12, note:`space loop: j = ${j}`});
-      steps.push({type:'space', i,j,line:13,row:rowIdx,col:j-1, note:`print(" ")`});
-    }
-    for(let j=1;j<=i;j++){
-      steps.push({type:'check', i,j,line:15, note:`star loop: j = ${j}`});
-      steps.push({type:'star', i,j,line:16,row:rowIdx,col:sp+j-1, note:`print("*")`});
-    }
-    steps.push({type:'newline', i, line:18, note:`println()`});
+  for (int j = 1; j <= 2 * (n - i); j++) {
+    System.out.print(" ");
   }
-  return steps;
+  for (int j = 1; j <= i; j++) {
+    System.out.print("*");
+  }
+  System.out.println();
+}`},
+{id:'zero_one', group:'मज़ेदार पैटर्न', label:'0-1 Triangle', code:
+`for (int i = 1; i <= n; i++) {
+  for (int j = 1; j <= i; j++) {
+    if ((i + j) % 2 == 0) {
+      System.out.print(1);
+    } else {
+      System.out.print(0);
+    }
+  }
+  System.out.println();
+}`}
+];
+
+/* ---------------- Tokenizer ---------------- */
+function tokenize(source){
+  const s = source.replace(/System\.out\.println/g,'__PRINTLN__').replace(/System\.out\.print/g,'__PRINT__');
+  const re = /"(?:[^"\\]|\\.)*"|\/\/[^\n]*|<=|>=|==|!=|\+\+|--|\+=|-=|&&|\|\||[(){};,+\-*/%<>=!]|[A-Za-z_][A-Za-z0-9_]*|\d+/g;
+  const tokens=[]; let m;
+  while((m=re.exec(s))!==null){
+    const val=m[0];
+    if(val.startsWith('//')) continue;
+    const line=(s.slice(0,m.index).match(/\n/g)||[]).length;
+    let type;
+    if(val[0]==='"'){ type='string'; }
+    else if(/^\d+$/.test(val)){ type='number'; }
+    else if(/^[A-Za-z_]/.test(val)){ type='ident'; }
+    else { type='op'; }
+    let value=val;
+    if(type==='string'){ value=val.slice(1,-1).replace(/\\"/g,'"'); }
+    tokens.push({type,value,line});
+  }
+  return tokens;
 }
 
-const GEN = {
-  triangle: genTriangle, invTriangle: genInvTriangle, pyramid: genPyramid,
-  invPyramid: genInvPyramid, diamond: genDiamond
-};
-const DIMS = {
-  triangle:(n)=>({rows:n, cols:n}), invTriangle:(n)=>({rows:n, cols:n}),
-  pyramid:(n)=>({rows:n, cols:n}), invPyramid:(n)=>({rows:n, cols:n}),
-  diamond:(n)=>({rows:2*n-1, cols:n})
-};
+/* ---------------- Parser ---------------- */
+function parseProgram(tokens){
+  let pos=0;
+  const peek=(o=0)=>tokens[pos+o];
+  const next=()=>tokens[pos++];
+  function expectVal(v){
+    const t=next();
+    if(!t||t.value!==v) throw new Error(`अपेक्षित '${v}' लेकिन मिला '${t?t.value:'EOF'}' ${t?`(line ${t.line+1})`:''}`);
+    return t;
+  }
+  function parseUpdateClause(){
+    const nameTok=next();
+    if(!nameTok||nameTok.type!=='ident') throw new Error(`variable नाम अपेक्षित था ${nameTok?`(line ${nameTok.line+1})`:''}`);
+    const name=nameTok.value;
+    const opTok=next();
+    if(!opTok) throw new Error(`अचानक कोड खत्म हो गया '${name}' के बाद`);
+    if(opTok.value==='++') return {op:'++', varName:name};
+    if(opTok.value==='--') return {op:'--', varName:name};
+    if(opTok.value==='+='||opTok.value==='-='||opTok.value==='='){
+      const expr=parseExpr();
+      return {op:opTok.value, varName:name, expr};
+    }
+    throw new Error(`अपेक्षित ++, --, +=, -= या = लेकिन मिला '${opTok.value}' (line ${opTok.line+1})`);
+  }
+  function parseStmt(){
+    const t=peek();
+    if(!t) throw new Error('अचानक कोड खत्म हो गया');
+    if(t.value==='for') return parseFor();
+    if(t.value==='if') return parseIf();
+    if(t.value==='__PRINT__') return parsePrint(false);
+    if(t.value==='__PRINTLN__') return parsePrint(true);
+    if(t.value==='int') return parseDecl();
+    if(t.type==='ident'){ const line=t.line; const upd=parseUpdateClause(); expectVal(';'); return {type:'assign', line, ...upd}; }
+    throw new Error(`अनपेक्षित token '${t.value}' (line ${t.line+1})`);
+  }
+  function parseFor(){
+    const line=peek().line;
+    expectVal('for'); expectVal('('); expectVal('int');
+    const varTok=next(); const varName=varTok.value;
+    expectVal('=');
+    const initExpr=parseExpr();
+    expectVal(';');
+    const cond=parseOr();
+    expectVal(';');
+    const update=parseUpdateClause();
+    expectVal(')'); expectVal('{');
+    const body=[];
+    while(peek() && peek().value!=='}') body.push(parseStmt());
+    expectVal('}');
+    return {type:'for', line, varName, initExpr, cond, update, body};
+  }
+  function parseIf(){
+    const line=peek().line;
+    expectVal('if'); expectVal('(');
+    const cond=parseOr();
+    expectVal(')'); expectVal('{');
+    const thenBody=[];
+    while(peek() && peek().value!=='}') thenBody.push(parseStmt());
+    expectVal('}');
+    let elseBody=null;
+    if(peek() && peek().value==='else'){
+      next(); expectVal('{');
+      elseBody=[];
+      while(peek() && peek().value!=='}') elseBody.push(parseStmt());
+      expectVal('}');
+    }
+    return {type:'if', line, cond, thenBody, elseBody};
+  }
+  function parseDecl(){
+    const line=peek().line;
+    expectVal('int');
+    const varTok=next(); const varName=varTok.value;
+    expectVal('=');
+    const expr=parseExpr();
+    expectVal(';');
+    return {type:'decl', line, varName, expr};
+  }
+  function parsePrint(isLn){
+    const line=peek().line;
+    next(); expectVal('(');
+    let arg=null;
+    if(!isLn){
+      if(peek() && peek().type==='string'){ arg={isString:true, value:next().value}; }
+      else { arg={isString:false, expr:parseExpr()}; }
+    }
+    expectVal(')'); expectVal(';');
+    return {type:isLn?'println':'print', line, arg};
+  }
+  function parseOr(){ let left=parseAnd(); while(peek() && peek().value==='||'){ next(); const right=parseAnd(); left={type:'or',left,right}; } return left; }
+  function parseAnd(){ let left=parseNot(); while(peek() && peek().value==='&&'){ next(); const right=parseNot(); left={type:'and',left,right}; } return left; }
+  function parseNot(){ if(peek() && peek().value==='!'){ next(); return {type:'not', expr:parseNot()}; } return parseRel(); }
+  function parseRel(){
+    const left=parseExpr();
+    const relOps=['<','<=','>','>=','==','!='];
+    if(peek() && relOps.includes(peek().value)){ const op=next().value; const right=parseExpr(); return {type:'rel', op, left, right}; }
+    return {type:'truthy', expr:left};
+  }
+  function parseExpr(){ let node=parseTerm(); while(peek() && (peek().value==='+'||peek().value==='-')){ const op=next().value; const right=parseTerm(); node={type:'bin', op, left:node, right}; } return node; }
+  function parseTerm(){ let node=parseFactor(); while(peek() && ['*','/','%'].includes(peek().value)){ const op=next().value; const right=parseFactor(); node={type:'bin', op, left:node, right}; } return node; }
+  function parseFactor(){
+    const t=peek();
+    if(!t) throw new Error('अचानक कोड खत्म हो गया (expression में)');
+    if(t.value==='-'){ next(); return {type:'neg', expr:parseFactor()}; }
+    if(t.value==='('){ next(); const e=parseExpr(); expectVal(')'); return e; }
+    if(t.type==='number'){ next(); return {type:'num', value:parseInt(t.value,10)}; }
+    if(t.type==='ident'){ next(); return {type:'var', name:t.value}; }
+    throw new Error(`अनपेक्षित token '${t.value}' (line ${t.line+1})`);
+  }
+  const stmts=[];
+  while(pos<tokens.length) stmts.push(parseStmt());
+  return stmts;
+}
 
-let steps=[], stepIdx=-1, n=5, pattern='triangle', playing=false, timer=null;
-let grid=[], rows=0, cols=0;
+/* ---------------- Evaluator ---------------- */
+function evalExpr(node, env){
+  switch(node.type){
+    case 'num': return node.value;
+    case 'var': if(!(node.name in env)) throw new Error(`अज्ञात variable '${node.name}'`); return env[node.name];
+    case 'neg': return -evalExpr(node.expr, env);
+    case 'bin': {
+      const l=evalExpr(node.left,env), r=evalExpr(node.right,env);
+      switch(node.op){ case '+': return l+r; case '-': return l-r; case '*': return l*r;
+        case '/': if(r===0) throw new Error('0 से भाग (divide by zero)'); return Math.trunc(l/r);
+        case '%': if(r===0) throw new Error('0 से mod (divide by zero)'); return l%r; }
+    }
+  }
+  throw new Error('अज्ञात expression');
+}
+function evalCond(node, env){
+  switch(node.type){
+    case 'or': return evalCond(node.left,env)||evalCond(node.right,env);
+    case 'and': return evalCond(node.left,env)&&evalCond(node.right,env);
+    case 'not': return !evalCond(node.expr,env);
+    case 'rel': {
+      const l=evalExpr(node.left,env), r=evalExpr(node.right,env);
+      switch(node.op){ case '<': return l<r; case '<=': return l<=r; case '>': return l>r;
+        case '>=': return l>=r; case '==': return l===r; case '!=': return l!==r; }
+    }
+    case 'truthy': return evalExpr(node.expr, env)!==0;
+  }
+  throw new Error('अज्ञात condition');
+}
+function applyUpdate(u, env){
+  if(!(u.varName in env)) throw new Error(`अज्ञात variable '${u.varName}'`);
+  switch(u.op){
+    case '++': env[u.varName]++; break;
+    case '--': env[u.varName]--; break;
+    case '+=': env[u.varName]+=evalExpr(u.expr,env); break;
+    case '-=': env[u.varName]-=evalExpr(u.expr,env); break;
+    case '=': env[u.varName]=evalExpr(u.expr,env); break;
+  }
+}
 
-function buildCode(){
-  const lines = CODES[pattern];
+/* ---------------- Interpreter (records steps) ---------------- */
+function runProgram(ast, nVal){
+  const env=Object.create(null); env.n=nVal;
+  const steps=[]; const rows=[]; let rowBuffer=[];
+  let guardCount=0; const MAX_STEPS=8000;
+  function guard(){ guardCount++; if(guardCount>MAX_STEPS) throw new Error('बहुत ज़्यादा iterations हो गए — n छोटा करो या loop की शर्त जांचो।'); }
+  function snapshot(){ const o={}; for(const k in env) if(k!=='n') o[k]=env[k]; return o; }
+  function execBlock(list){ for(const st of list) execStmt(st); }
+  function execStmt(node){
+    guard();
+    switch(node.type){
+      case 'for': {
+        env[node.varName]=evalExpr(node.initExpr, env);
+        while(evalCond(node.cond, env)){
+          guard();
+          steps.push({kind:'check', line:node.line, vars:snapshot(), note:`${node.varName} = ${env[node.varName]}`});
+          execBlock(node.body);
+          applyUpdate(node.update, env);
+        }
+        break;
+      }
+      case 'if': {
+        const c=evalCond(node.cond, env);
+        steps.push({kind:'check', line:node.line, vars:snapshot(), note:`if शर्त → ${c?'सच ✓':'ग़लत ✗'}`});
+        if(c) execBlock(node.thenBody); else if(node.elseBody) execBlock(node.elseBody);
+        break;
+      }
+      case 'decl': {
+        env[node.varName]=evalExpr(node.expr, env);
+        steps.push({kind:'check', line:node.line, vars:snapshot(), note:`${node.varName} = ${env[node.varName]}`});
+        break;
+      }
+      case 'assign': {
+        applyUpdate(node, env);
+        steps.push({kind:'check', line:node.line, vars:snapshot(), note:`${node.varName} = ${env[node.varName]}`});
+        break;
+      }
+      case 'print': {
+        let text;
+        if(node.arg.isString) text=node.arg.value; else text=String(evalExpr(node.arg.expr, env));
+        const kind = text===' ' ? 'space' : (text==='*' ? 'star' : 'value');
+        const row=rows.length, col=rowBuffer.length;
+        rowBuffer.push({kind,text});
+        const note = kind==='star' ? `print("*") → row ${row+1}, position ${col+1}`
+                   : kind==='space' ? `print(" ") → खाली जगह`
+                   : `print(${text}) → row ${row+1}, position ${col+1}`;
+        steps.push({kind, line:node.line, vars:snapshot(), row, col, text, note});
+        break;
+      }
+      case 'println': {
+        rows.push(rowBuffer); rowBuffer=[];
+        steps.push({kind:'newline', line:node.line, vars:snapshot(), note:'println() → अगली पंक्ति'});
+        break;
+      }
+    }
+  }
+  execBlock(ast);
+  if(rowBuffer.length) rows.push(rowBuffer);
+  const cols = rows.reduce((m,r)=>Math.max(m,r.length),0) || 1;
+  return {steps, rowCount: rows.length || 1, cols};
+}
+
+/* ---------------- UI wiring ---------------- */
+const templateSel=document.getElementById('templateSel');
+const nRange=document.getElementById('nRange'), nVal=document.getElementById('nVal');
+const speedRange=document.getElementById('speedRange');
+const showSpaces=document.getElementById('showSpaces');
+const codeBox=document.getElementById('codeBox');
+const codeEdit=document.getElementById('codeEdit');
+const editBtn=document.getElementById('editBtn'), cancelBtn=document.getElementById('cancelBtn');
+const errBanner=document.getElementById('errBanner');
+const watchChips=document.getElementById('watchChips');
+const explainBox=document.getElementById('explainBox');
+const progBar=document.getElementById('progBar');
+const stageGrid=document.getElementById('stageGrid');
+const consoleBox=document.getElementById('consoleBox');
+const playBtn=document.getElementById('playBtn'), stepBtn=document.getElementById('stepBtn');
+const backBtn=document.getElementById('backBtn'), resetBtn=document.getElementById('resetBtn');
+
+let n=parseInt(nRange.value,10);
+let currentSource='';
+let steps=[], stepIdx=-1, rowCount=1, cols=1, playing=false, timer=null, isEditing=false;
+let varColorMap={};
+const PALETTE=['#f472b6','#7aa2f7','#6ee7b7','#f4b860','#c792ea','#89ddff'];
+
+/* build template select with optgroups */
+(function buildTemplateSelect(){
+  const groups={};
+  TEMPLATES.forEach(t=>{ (groups[t.group]=groups[t.group]||[]).push(t); });
+  Object.keys(groups).forEach(g=>{
+    const og=document.createElement('optgroup'); og.label=g;
+    groups[g].forEach(t=>{ const o=document.createElement('option'); o.value=t.id; o.textContent=t.label; og.appendChild(o); });
+    templateSel.appendChild(og);
+  });
+})();
+
+function showError(msg){
+  errBanner.style.display='block';
+  errBanner.textContent='⚠ '+msg;
+}
+function clearError(){ errBanner.style.display='none'; errBanner.textContent=''; }
+
+function buildCodeView(lines){
   codeBox.innerHTML = lines.map((t,idx)=>
     `<code class="line" data-ln="${idx}"><span class="ln">${idx+1}</span>${escapeHtml(t)}</code>`
   ).join('');
 }
-function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function buildGridDom(){
-  const d = DIMS[pattern](n);
-  rows=d.rows; cols=d.cols;
-  grid = Array.from({length:rows}, ()=>Array(cols).fill(null));
-  stageGrid.style.gridTemplateColumns = `repeat(${cols}, 24px)`;
   stageGrid.innerHTML='';
-  for(let r=0;r<rows;r++){
+  const containerWidth = stageGrid.clientWidth || 320;
+  const cellPx = Math.max(12, Math.min(26, Math.floor((containerWidth-(cols-1)*3)/cols)));
+  stageGrid.style.setProperty('--cellsize', cellPx+'px');
+  stageGrid.style.gridTemplateColumns = `repeat(${cols}, var(--cellsize))`;
+  for(let r=0;r<rowCount;r++){
     for(let c=0;c<cols;c++){
       const cell=document.createElement('div');
-      cell.className='cell';
-      cell.dataset.r=r; cell.dataset.c=c;
+      cell.className='cell'; cell.dataset.r=r; cell.dataset.c=c;
       stageGrid.appendChild(cell);
     }
   }
 }
 
-function resetAll(){
-  pause();
-  steps = GEN[pattern](n);
-  stepIdx = -1;
-  buildCode();
-  buildGridDom();
-  consoleBox.innerHTML = '<span class="caret"></span>';
-  chipI.textContent='i = —'; chipI.classList.remove('on');
-  chipJ.textContent='j = —'; chipJ.classList.remove('on');
-  explainBox.innerHTML = '▶ दबाओ या "अगला" पर क्लिक करके शुरू करो।';
-  document.querySelectorAll('code.line').forEach(l=>l.classList.remove('active'));
-  progBar.style.width='0%';
+function computeVarColors(){
+  varColorMap={}; let cursor=0;
+  steps.forEach(s=>{ Object.keys(s.vars).forEach(k=>{ if(!(k in varColorMap)){ varColorMap[k]=PALETTE[cursor%PALETTE.length]; cursor++; } }); });
+}
+function renderChips(vars){
+  const keys=Object.keys(vars);
+  if(keys.length===0){ watchChips.innerHTML='<span class="chip" style="color:var(--dim);">कोई variable active नहीं</span>'; return; }
+  watchChips.innerHTML = keys.map(k=>{
+    const color=varColorMap[k]||'#888';
+    return `<span class="chip" style="color:${color}; border-color:${color};">${k} = ${vars[k]}</span>`;
+  }).join('');
 }
 
-function renderCell(r,c,type){
-  const el = stageGrid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
-  if(!el) return;
-  el.classList.remove('pulse');
-  if(type==='star'){ el.classList.add('star'); el.textContent='★'; }
-  else if(type==='space'){
-    el.classList.remove('star');
-    el.classList.toggle('space-dot', showSpaces.checked);
-    el.textContent = showSpaces.checked ? '·' : '';
+function compileAndRun(sourceText){
+  try{
+    const tokens=tokenize(sourceText);
+    const ast=parseProgram(tokens);
+    const result=runProgram(ast, n);
+    steps=result.steps; rowCount=result.rowCount; cols=result.cols;
+    currentSource=sourceText;
+    computeVarColors();
+    buildCodeView(sourceText.split('\n'));
+    clearError();
+    pause();
+    stepIdx=-1;
+    buildGridDom();
+    consoleBox.innerHTML='<span class="caret"></span>';
+    watchChips.innerHTML='';
+    explainBox.innerHTML='▶ दबाओ या "अगला" पर क्लिक करके शुरू करो।';
+    progBar.style.width='0%';
+    return true;
+  }catch(e){
+    showError(e.message || String(e));
+    return false;
   }
+}
+
+function renderCell(r,c,kind,text){
+  const el=stageGrid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+  if(!el) return;
+  el.classList.remove('pulse','star','value','space-dot');
+  if(kind==='star'){ el.classList.add('star'); el.textContent='★'; }
+  else if(kind==='value'){ el.classList.add('value'); el.textContent=text; }
+  else if(kind==='space'){ el.classList.toggle('space-dot', showSpaces.checked); el.textContent = showSpaces.checked ? '·' : ''; }
   void el.offsetWidth;
   el.classList.add('pulse');
-}
-function clearCellVisual(r,c){
-  const el = stageGrid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
-  if(!el) return;
-  el.classList.remove('star','space-dot','pulse'); el.textContent='';
 }
 
 function applyStepForward(step){
   document.querySelectorAll('code.line').forEach(l=>l.classList.remove('active'));
-  const activeLine = codeBox.querySelector(`code.line[data-ln="${step.line}"]`);
+  const activeLine=codeBox.querySelector(`code.line[data-ln="${step.line}"]`);
   if(activeLine) activeLine.classList.add('active');
-
-  chipI.textContent = `i = ${step.i}`; chipI.classList.add('on');
-  if(step.j!==undefined){ chipJ.textContent = `j = ${step.j}`; chipJ.classList.add('on'); }
-  else { chipJ.textContent='j = —'; chipJ.classList.remove('on'); }
-
-  explainBox.innerHTML = `<b>${step.note}</b>`;
-
-  if(step.type==='star' || step.type==='space'){
-    grid[step.row][step.col]=step.type;
-    renderCell(step.row, step.col, step.type);
-    const ch = step.type==='star' ? '*' : ' ';
-    consoleBox.innerHTML = consoleBox.innerHTML.replace('<span class="caret"></span>', ch + '<span class="caret"></span>');
-  } else if(step.type==='newline'){
+  renderChips(step.vars);
+  explainBox.innerHTML=`<b>${step.note}</b>`;
+  if(step.kind==='star'||step.kind==='space'||step.kind==='value'){
+    renderCell(step.row, step.col, step.kind, step.text);
+    const ch = step.kind==='value' ? step.text : (step.kind==='star' ? '*' : ' ');
+    consoleBox.innerHTML = consoleBox.innerHTML.replace('<span class="caret"></span>', ch+'<span class="caret"></span>');
+  } else if(step.kind==='newline'){
     consoleBox.innerHTML = consoleBox.innerHTML.replace('<span class="caret"></span>', '\n<span class="caret"></span>');
   }
-  consoleBox.scrollTop = consoleBox.scrollHeight;
+  consoleBox.scrollTop=consoleBox.scrollHeight;
 }
 
 function goToIndex(targetIdx){
-  // rebuild visual state up to targetIdx (simple + reliable for small n)
   buildGridDom();
-  consoleBox.innerHTML = '<span class="caret"></span>';
+  consoleBox.innerHTML='<span class="caret"></span>';
   document.querySelectorAll('code.line').forEach(l=>l.classList.remove('active'));
-  for(let k=0;k<=targetIdx;k++){
-    applyStepForward(steps[k]);
-  }
-  stepIdx = targetIdx;
-  progBar.style.width = `${Math.max(0,((stepIdx+1)/steps.length)*100)}%`;
+  for(let k=0;k<=targetIdx;k++) applyStepForward(steps[k]);
+  stepIdx=targetIdx;
+  progBar.style.width=`${Math.max(0,((stepIdx+1)/steps.length)*100)}%`;
   if(stepIdx<0){
-    chipI.textContent='i = —'; chipI.classList.remove('on');
-    chipJ.textContent='j = —'; chipJ.classList.remove('on');
-    explainBox.innerHTML = '▶ दबाओ या "अगला" पर क्लिक करके शुरू करो।';
+    watchChips.innerHTML='';
+    explainBox.innerHTML='▶ दबाओ या "अगला" पर क्लिक करके शुरू करो।';
   }
 }
 
@@ -474,49 +803,73 @@ function stepForward(){
   if(stepIdx>=steps.length-1){ pause(); return; }
   stepIdx++;
   applyStepForward(steps[stepIdx]);
-  progBar.style.width = `${((stepIdx+1)/steps.length)*100}%`;
+  progBar.style.width=`${((stepIdx+1)/steps.length)*100}%`;
   if(stepIdx>=steps.length-1) pause();
 }
-function stepBack(){
-  if(stepIdx<=-1) return;
-  goToIndex(stepIdx-1);
-}
+function stepBack(){ if(stepIdx<=-1) return; goToIndex(stepIdx-1); }
 
 function play(){
-  if(stepIdx>=steps.length-1) resetAllKeepStart();
-  playing=true;
-  playBtn.textContent='⏸ रोको';
-  const speed = 11 - parseInt(speedRange.value,10); // invert: higher slider = faster
-  const interval = 60 + speed*70;
-  timer = setInterval(()=>{
-    stepForward();
-    if(stepIdx>=steps.length-1) pause();
-  }, interval);
+  if(isEditing) return;
+  if(stepIdx>=steps.length-1){ stepIdx=-1; buildGridDom(); consoleBox.innerHTML='<span class="caret"></span>'; }
+  playing=true; playBtn.textContent='⏸ रोको';
+  const speed=11-parseInt(speedRange.value,10);
+  const interval=60+speed*70;
+  timer=setInterval(()=>{ stepForward(); if(stepIdx>=steps.length-1) pause(); }, interval);
 }
-function pause(){
-  playing=false;
-  playBtn.textContent='▶ चलाएँ';
-  if(timer){ clearInterval(timer); timer=null; }
-}
-function resetAllKeepStart(){
-  stepIdx=-1;
-  buildGridDom();
-  consoleBox.innerHTML = '<span class="caret"></span>';
+function pause(){ playing=false; playBtn.textContent='▶ चलाएँ'; if(timer){ clearInterval(timer); timer=null; } }
+
+function setPlaybackEnabled(enabled){
+  [playBtn,stepBtn,backBtn,resetBtn,templateSel,nRange].forEach(el=>el.disabled=!enabled);
 }
 
-// events
-patternSel.addEventListener('change', ()=>{ pattern=patternSel.value; resetAll(); });
-nRange.addEventListener('input', ()=>{ n=parseInt(nRange.value,10); nVal.textContent=n; resetAll(); });
+/* ---- events ---- */
+templateSel.addEventListener('change', ()=>{
+  const t=TEMPLATES.find(x=>x.id===templateSel.value);
+  if(t) compileAndRun(t.code);
+});
+nRange.addEventListener('input', ()=>{ n=parseInt(nRange.value,10); nVal.textContent=n; compileAndRun(currentSource); });
+speedRange.addEventListener('input', ()=>{ if(playing){ pause(); play(); } });
 showSpaces.addEventListener('change', ()=>{ goToIndex(stepIdx); });
 playBtn.addEventListener('click', ()=>{ playing ? pause() : play(); });
 stepBtn.addEventListener('click', ()=>{ pause(); stepForward(); });
 backBtn.addEventListener('click', ()=>{ pause(); stepBack(); });
-resetBtn.addEventListener('click', resetAll);
+resetBtn.addEventListener('click', ()=>{ compileAndRun(currentSource); });
 
-// init
-n = parseInt(nRange.value,10);
-pattern = patternSel.value;
-resetAll();
+editBtn.addEventListener('click', ()=>{
+  if(!isEditing){
+    isEditing=true; pause();
+    codeEdit.value=currentSource;
+    codeBox.style.display='none'; codeEdit.style.display='block';
+    editBtn.textContent='▶ Run कोड'; editBtn.classList.add('run');
+    cancelBtn.style.display='inline-block';
+    setPlaybackEnabled(false);
+    clearError();
+    codeEdit.focus();
+  } else {
+    const ok=compileAndRun(codeEdit.value);
+    if(ok){
+      isEditing=false;
+      codeBox.style.display='block'; codeEdit.style.display='none';
+      editBtn.textContent='✎ Edit'; editBtn.classList.remove('run');
+      cancelBtn.style.display='none';
+      setPlaybackEnabled(true);
+    }
+  }
+});
+cancelBtn.addEventListener('click', ()=>{
+  isEditing=false;
+  codeBox.style.display='block'; codeEdit.style.display='none';
+  editBtn.textContent='✎ Edit'; editBtn.classList.remove('run');
+  cancelBtn.style.display='none';
+  clearError();
+  setPlaybackEnabled(true);
+});
+
+window.addEventListener('resize', ()=>{ if(!isEditing) goToIndex(stepIdx); });
+
+/* init */
+templateSel.value='right_triangle';
+compileAndRun(TEMPLATES[0].code);
 </script>
 </body>
 </html>
